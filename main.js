@@ -11,6 +11,7 @@ class MessageWidget {
   position = "";
   open = false;
   widgetContainer = null;
+  titlePlaceholder = null;
 
   getPosition(position) {
     const [vertical, horizontal] = position.split("-");
@@ -54,6 +55,12 @@ class MessageWidget {
     this.closeIcon = closeIconElement;
 
     /**
+     * Create a form element, update it's innerHTML property to an icon which would serve as the form body during that state.
+     */
+    const formElement = document.createElement("form");
+    this.form = formElement;
+
+    /**
      * Append both icons created to the button element and add a `click` event listener on the button to toggle the widget open and close.
      */
     buttonContainer.appendChild(this.widgetIcon);
@@ -79,56 +86,26 @@ class MessageWidget {
   }
 
   createWidgetContent() {
+
+    const xhr = new XMLHttpRequest();
+    const url='http://127.0.0.1:10000/api/content';
+    xhr.open("GET", url);
+    xhr.send();
+    
+    xhr.onload = (e) => {
+      this.form.innerHTML = JSON.parse(xhr.responseText).html;
+    }
+
     this.widgetContainer.innerHTML = `
         <header class="widget__header">
-            <h3>Start a conversation</h3>
-            <p>We usually respond within a few hours</p>
-        </header>
+            <h4>University Information Technology Services</h4>
+            <p><small>Information Security and Technology Assurance Division</small></p>
+        </header>`;
+        this.widgetContainer.appendChild(this.form);
+        this.form.classList.add("form__field");
 
-        <form>
-            <div class="form__field">
-                <label for="name">Name</label>
-                <input
-                type="text"
-                id="name"
-                name="name"
-                placeholder="Enter your name"
-                />
-            </div>
+        // <form><div class="form__field"><label for="name">Name</label><input type="text" id="name" name="name"placeholder="Enter your name"/></div><button>Send Message</button></form>
 
-            <div class="form__field">
-                <label for="email">Email</label>
-                <input
-                type="email"
-                id="email"
-                name="email"
-                placeholder="Enter your email"
-                />
-            </div>
-
-            <div class="form__field">
-                <label for="subject">Subject</label>
-                <input
-                type="text"
-                id="subject"
-                name="subject"
-                placeholder="Enter Message Subject"
-                />
-            </div>
-
-            <div class="form__field">
-                <label for="message">Message</label>
-                <textarea
-                id="message"
-                name="message"
-                placeholder="Enter your message"
-                rows="6"
-                ></textarea>
-            </div>
-
-            <button>Send Message</button>
-        </form>
-    `;
   }
 
   injectStyles() {
@@ -143,7 +120,8 @@ class MessageWidget {
     if (this.open) {
       this.widgetIcon.classList.add("widget__hidden");
       this.closeIcon.classList.remove("widget__hidden");
-      this.widgetContainer.classList.remove("widget__hidden");
+      this.widgetContainer.classList.remove("widget__hidden");   
+      this.form.innerHTML = '';
     } else {
       this.createWidgetContent();
       this.widgetIcon.classList.remove("widget__hidden");
