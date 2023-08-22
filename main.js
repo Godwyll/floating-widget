@@ -88,7 +88,7 @@ class MessageWidget {
   createWidgetContent() {
 
     const xhr = new XMLHttpRequest();
-    const url='http://127.0.0.1:10000/api/content';
+    const url='https://8dnetwork.com/widget/api/content';
     xhr.open("GET", url);
     xhr.send();
     
