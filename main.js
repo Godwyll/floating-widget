@@ -1,4 +1,4 @@
-import { CLOSE_ICON, MESSAGE_ICON, styles } from "./assets.js";
+import { CLOSE_ICON, SHIELD_ICON, styles } from "./assets.js";
 
 class MessageWidget {
   constructor(position = "bottom-right") {
@@ -42,7 +42,7 @@ class MessageWidget {
      * Create a span element for the widget icon, give it a class of 'widget__icon', update it's innerHTML property to an icon which would serve as the widget icon.
      */
     const widgetIconElement = document.createElement("span");
-    widgetIconElement.innerHTML = MESSAGE_ICON;
+    widgetIconElement.innerHTML = SHIELD_ICON;
     widgetIconElement.classList.add("widget__icon");
     this.widgetIcon = widgetIconElement;
 
@@ -55,10 +55,10 @@ class MessageWidget {
     this.closeIcon = closeIconElement;
 
     /**
-     * Create a form element, update it's innerHTML property to an icon which would serve as the form body during that state.
+     * Create a container for the form, update it's innerHTML property to an icon which would serve as the form body during that state.
      */
-    const formElement = document.createElement("form");
-    this.form = formElement;
+    const formContainer = document.createElement("form");
+    this.formContainer = formContainer;
 
     /**
      * Append both icons created to the button element and add a `click` event listener on the button to toggle the widget open and close.
@@ -83,29 +83,30 @@ class MessageWidget {
      */
     container.appendChild(this.widgetContainer);
     container.appendChild(buttonContainer);
+    
+    this.loadWidgetContent();
+  }
+
+  loadWidgetContent() {
+    const url='http://127.0.0.1:4000/api/content';
+    // const url='https://8dnetwork.com/widget/api/content';
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", url);
+    xhr.send();
+    xhr.onload = (e) => {
+      this.formContainer.innerHTML = xhr.responseText;
+    }
   }
 
   createWidgetContent() {
-
-    const xhr = new XMLHttpRequest();
-    const url='https://8dnetwork.com/widget/api/content';
-    xhr.open("GET", url);
-    xhr.send();
-    
-    xhr.onload = (e) => {
-      this.form.innerHTML = JSON.parse(xhr.responseText).html;
-    }
 
     this.widgetContainer.innerHTML = `
         <header class="widget__header">
             <h4>University Information Technology Services</h4>
             <p><small>Information Security and Technology Assurance Division</small></p>
         </header>`;
-        this.widgetContainer.appendChild(this.form);
-        this.form.classList.add("form__field");
-
-        // <form><div class="form__field"><label for="name">Name</label><input type="text" id="name" name="name"placeholder="Enter your name"/></div><button>Send Message</button></form>
-
+        this.widgetContainer.appendChild(this.formContainer);
+        this.formContainer.classList.add("form__field");
   }
 
   injectStyles() {
@@ -121,9 +122,12 @@ class MessageWidget {
       this.widgetIcon.classList.add("widget__hidden");
       this.closeIcon.classList.remove("widget__hidden");
       this.widgetContainer.classList.remove("widget__hidden");   
-      this.form.innerHTML = '';
+      
     } else {
+      this.formContainer.innerHTML = '';
+      this.loadWidgetContent();
       this.createWidgetContent();
+      
       this.widgetIcon.classList.remove("widget__hidden");
       this.closeIcon.classList.add("widget__hidden");
       this.widgetContainer.classList.add("widget__hidden");
