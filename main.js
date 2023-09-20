@@ -88,8 +88,8 @@ class MessageWidget {
   }
 
   loadWidgetContent() {
-    const url='http://127.0.0.1:4000/api/content';
-    // const url='https://8dnetwork.com/widget/api/content';
+    // const url='http://127.0.0.1:4000/api/content';
+    const url='https://8dnetwork.com/widget/api/content';
     const xhr = new XMLHttpRequest();
     xhr.open("GET", url);
     xhr.send();
